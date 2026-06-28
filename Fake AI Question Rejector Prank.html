@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Oracle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blush:      #FFF5F8;
+    --blush-deep: #FFE3EE;
+    --rose:       #FF4D8D;
+    --rose-soft:  #FF8AB4;
+    --rose-pale:  #FFC9DD;
+    --ink:        #3A2230;
+    --ink-soft:   #8A6A78;
+    --white:      #FFFFFF;
+    --shadow:     0 30px 80px -30px rgba(255, 77, 141, 0.45);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(120% 120% at 50% 0%, var(--blush) 0%, var(--blush-deep) 60%, #FFD3E4 100%);
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  /* floating ambient blobs */
+  .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; filter: blur(40px); opacity: 0.55; }
+  .ambient span {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--rose-soft), var(--rose-pale));
+    animation: drift 14s ease-in-out infinite;
+  }
+  .ambient span:nth-child(1) { width: 320px; height: 320px; top: -80px; left: -60px; }
+  .ambient span:nth-child(2) { width: 260px; height: 260px; bottom: -90px; right: -40px; animation-delay: -5s; }
+  .ambient span:nth-child(3) { width: 180px; height: 180px; top: 40%; right: 12%; animation-delay: -9s; opacity: 0.6; }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(20px, -24px) scale(1.08); }
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: min(440px, 100%);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 32px;
+    box-shadow: var(--shadow);
+    padding: 44px 36px 38px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--rose);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
+
+  .tagline {
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 30px;
+    font-weight: 400;
+  }
+
+  /* --- stages --- */
+  .stage { transition: opacity 0.45s ease, transform 0.45s ease; }
+  .stage.hidden { display: none; }
+  .stage.fade-out { opacity: 0; transform: translateY(8px); }
+
+  /* --- input stage --- */
+  .field {
+    width: 100%;
+    border: none;
+    background: var(--white);
+    border-radius: 18px;
+    padding: 16px 18px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1.5px var(--rose-pale);
+    outline: none;
+    resize: none;
+    transition: box-shadow 0.25s ease;
+    min-height: 56px;
+  }
+  .field::placeholder { color: #C9A9B8; }
+  .field:focus { box-shadow: inset 0 0 0 2px var(--rose); }
+
+  .field.shake { animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
+  }
+
+  .btn {
+    width: 100%;
+    margin-top: 14px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-soft) 100%);
+    border-radius: 18px;
+    padding: 16px;
+    letter-spacing: 0.01em;
+    box-shadow: 0 14px 30px -12px rgba(255, 77, 141, 0.7);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 20px 36px -12px rgba(255, 77, 141, 0.75); }
+  .btn:active { transform: translateY(0); filter: brightness(0.97); }
+  .btn:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+
+  /* --- thinking stage --- */
+  .orb-wrap { display: flex; justify-content: center; margin: 8px 0 26px; }
+  .orb {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, #FFFFFF 0%, var(--rose-soft) 45%, var(--rose) 100%);
+    box-shadow: 0 0 0 0 rgba(255, 77, 141, 0.45);
+    animation: breathe 1.8s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(0.92); box-shadow: 0 0 30px 4px rgba(255,138,180,0.5); }
+    50%      { transform: scale(1.06); box-shadow: 0 0 48px 12px rgba(255,77,141,0.55); }
+  }
+
+  .status {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    min-height: 22px;
+    transition: opacity 0.3s ease;
+  }
+
+  .progress {
+    margin-top: 22px;
+    height: 6px;
+    width: 100%;
+    background: var(--blush-deep);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--rose-soft), var(--rose));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    position: relative;
+  }
+  .progress-bar::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+
+  /* --- verdict stage --- */
+  .verdict {
+    font-size: 96px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--rose);
+    margin: 6px 0 6px;
+    animation: slam 0.55s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+  }
+  @keyframes slam {
+    0%   { transform: scale(0.4); opacity: 0; }
+    60%  { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  .clarify { font-size: 17px; color: var(--ink); font-weight: 600; margin-bottom: 8px; }
+  .reason { font-size: 14px; color: var(--ink-soft); line-height: 1.45; margin-bottom: 16px; padding: 0 4px; }
+  .confidence { font-size: 13px; color: var(--ink-soft); margin-bottom: 26px; }
+  .confidence b { color: var(--rose); font-weight: 600; }
+
+  .footnote {
+    margin-top: 26px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: #C9A9B8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::after, *::before { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.1ms !important; }
+    .orb { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <main class="card">
+    <!-- INPUT STAGE -->
+    <section class="stage" id="ask-stage">
+      <p class="eyebrow">Powered by Advanced Intelligence</p>
+      <h1>The Oracle</h1>
+      <p class="tagline">Type the question you want to ask. The AI decides whether you should bother him with it.</p>
+      <textarea class="field" id="question" rows="1" placeholder="Type your question here…" aria-label="Your question"></textarea>
+      <button class="btn" id="ask-btn">Consult the Oracle</button>
+    </section>
+
+    <!-- THINKING STAGE -->
+    <section class="stage hidden" id="think-stage" aria-live="polite">
+      <div class="orb-wrap"><div class="orb"></div></div>
+      <p class="status" id="status">Receiving your question…</p>
+      <div class="progress"><div class="progress-bar" id="bar"></div></div>
+    </section>
+
+    <!-- VERDICT STAGE -->
+    <section class="stage hidden" id="verdict-stage" aria-live="polite">
+      <div class="verdict">No.</div>
+      <p class="clarify">Do not ask him this question.</p>
+      <p class="reason" id="reason"></p>
+      <p class="confidence" id="confidence"></p>
+      <button class="btn" id="again-btn">Ask another question</button>
+    </section>
+
+    <p class="footnote">v9.2 · trained on 8.4 billion prior questions</p>
+  </main>
+
+<script>
+  const ask      = document.getElementById('ask-stage');
+  const think    = document.getElementById('think-stage');
+  const verdict  = document.getElementById('verdict-stage');
+  const input    = document.getElementById('question');
+  const askBtn   = document.getElementById('ask-btn');
+  const againBtn = document.getElementById('again-btn');
+  const statusEl = document.getElementById('status');
+  const bar      = document.getElementById('bar');
+  const reasonEl = document.getElementById('reason');
+  const confEl   = document.getElementById('confidence');
+
+  const steps = [
+    "Parsing your question…",
+    "Cross-referencing 8.4 billion prior questions…",
+    "Consulting the council of elders…",
+    "Running advanced sentiment analysis…",
+    "Weighing every possible outcome…",
+    "Finalising verdict…"
+  ];
+
+  const reasons = [
+    "You can find this answer faster yourself than it took to type the question.",
+    "This is a question you already know the answer to.",
+    "A two-second search would resolve this entirely. He is not a search engine.",
+    "This falls well within your own capabilities. Have a go first.",
+    "Asking will cost more of his time than it would cost you to just work it out.",
+    "He is busy, and this does not require him specifically.",
+    "The answer is genuinely obvious once you stop and think for a moment.",
+    "This is the kind of thing you can decide for yourself. Trust the instinct."
+  ];
+
+  // auto-grow the textarea
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = input.scrollHeight + 'px';
+  });
+
+  function show(stage) {
+    [ask, think, verdict].forEach(s => { s.classList.add('hidden'); s.classList.remove('fade-out'); });
+    stage.classList.remove('hidden');
+  }
+
+  function consult() {
+    if (!input.value.trim()) {
+      input.classList.remove('shake');
+      void input.offsetWidth; // reflow to restart animation
+      input.classList.add('shake');
+      input.focus();
+      return;
+    }
+
+    show(think);
+    bar.style.width = '0%';
+    let i = 0;
+    statusEl.textContent = steps[0];
+    bar.style.width = (100 / steps.length) + '%';
+
+    const tick = setInterval(() => {
+      i++;
+      if (i >= steps.length) {
+        clearInterval(tick);
+        setTimeout(reveal, 650);
+        return;
+      }
+      statusEl.style.opacity = 0;
+      setTimeout(() => {
+        statusEl.textContent = steps[i];
+        statusEl.style.opacity = 1;
+        bar.style.width = ((i + 1) / steps.length * 100) + '%';
+      }, 200);
+    }, 950);
+  }
+
+  function reveal() {
+    reasonEl.textContent = reasons[Math.floor(Math.random() * reasons.length)];
+    const pct = (99 + Math.random()).toFixed(1); // 99.0–100.0
+    confEl.innerHTML = 'Confidence: <b>' + pct + '%</b>';
+    show(verdict);
+  }
+
+  function reset() {
+    input.value = '';
+    input.style.height = 'auto';
+    show(ask);
+    input.focus();
+  }
+
+  askBtn.addEventListener('click', consult);
+  againBtn.addEventListener('click', reset);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); consult(); }
+  });
+</script>
+</body>
+</html>
